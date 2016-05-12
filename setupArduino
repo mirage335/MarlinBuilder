@@ -48,6 +48,12 @@ then
 	exit
 fi
 
+if [[ "$scriptFolder" == "$HOME" ]]
+then
+	echo -e '\E[1;33;41m ABORTING! DO NOT put these scripts in your home directory! \E[0m'
+	exit
+fi
+
 ##### directory guard #####
 
 importGit() {
@@ -78,5 +84,26 @@ importGit "./Arduino/hardware/MarlinDev/" "git@github.com:MarlinFirmware/MarlinD
 
 importGit "./Arduino/tools" "git@github.com:MarlinFirmware/MarlinDev.git" "versioning" -b "versioning"
 
-./launchArduino --pref runtime.tools.versioning.path="$HOME"/Arduino/tools/versioning --pref editor.update_extension=false
+./launchArduino --pref runtime.tools.versioning.path="$HOME"/Arduino/tools/versioning --pref editor.update_extension=false \
+    --pref board=mega --pref target_package=MarlinDev \
+    --pref last.sketch.default.path=$HOME/Arduino/libraries/MarlinDev/examples/MarlinFirmware/MarlinFirmware.ino \
+    --pref last.sketch0.path=$HOME/Arduino/libraries/MarlinDev/examples/MarlinFirmware/MarlinFirmware.ino \
+    --pref last.sketch.count=1
 
+cat <<EOT
+---------------------------------------------
+Marlin Development Environment Setup Complete
+---------------------------------------------
+
+To run the environment, please run 
+
+   ./launchArduino 
+
+This will run a chroot'ed (proot) Arduino environment, safely isolated from 
+your real $HOME/Arduino.
+
+You may wish to link this launch script to your path, e.g.
+
+  ln -s $scriptFolder/launchArduino ~/bin/marlinDevArduino
+
+EOT
